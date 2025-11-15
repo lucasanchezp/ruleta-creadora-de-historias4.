@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta de Historias</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        }
+        .duration-3000 {
+            transition-duration: 3000ms;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const StoryWheel = () => {
+          const [spinning, setSpinning] = useState(false);
+          const [results, setResults] = useState({ character: '', place: '', problem: '' });
+          const [rotations, setRotations] = useState({ character: 0, place: 0, problem: 0 });
+
+          const characters = [
+            "Un astronauta valiente",
+            "Una científica curiosa",
+            "Un dragón amigable",
+            "Una detective astuta",
+            "Un robot simpático",
+            "Una superheroína",
+            "Un pirata aventurero",
+            "Una princesa rebelde",
+            "Un mago aprendiz",
+            "Una chef talentosa",
+            "Un explorador intrépido",
+            "Una bailarina soñadora",
+            "Un inventor genial",
+            "Una sirena cantante",
+            "Un ninja sigiloso"
+          ];
+
+          const places = [
+            "En una nave espacial",
+            "En un castillo encantado",
+            "En el fondo del océano",
+            "En una selva misteriosa",
+            "En una ciudad futurista",
+            "En las nubes",
+            "En un volcán activo",
+            "En una biblioteca mágica",
+            "En el desierto",
+            "En una isla desierta",
+            "En las montañas nevadas",
+            "En un laboratorio secreto",
+            "En un circo ambulante",
+            "En una cueva de cristal",
+            "En un bosque encantado"
+          ];
+
+          const problems = [
+            "Debe encontrar un tesoro perdido",
+            "Tiene que salvar a su mejor amigo",
+            "Necesita romper una maldición",
+            "Debe resolver un misterio antiguo",
+            "Tiene que detener a un villano",
+            "Necesita encontrar el camino a casa",
+            "Debe proteger una criatura mágica",
+            "Tiene que recuperar un objeto robado",
+            "Necesita aprender un nuevo poder",
+            "Debe ganar un torneo importante",
+            "Tiene que superar su mayor miedo",
+            "Necesita hacer un nuevo amigo",
+            "Debe descubrir un secreto",
+            "Tiene que preparar una gran celebración",
+            "Necesita arreglar algo que rompió"
+          ];
+
+          const spinWheels = () => {
+            if (spinning) return;
+            
+            setSpinning(true);
+            
+            const charIndex = Math.floor(Math.random() * characters.length);
+            const placeIndex = Math.floor(Math.random() * places.length);
+            const problemIndex = Math.floor(Math.random() * problems.length);
+            
+            const baseRotation = 1800;
+            const charRotation = baseRotation + (charIndex * (360 / characters.length));
+            const placeRotation = baseRotation + 120 + (placeIndex * (360 / places.length));
+            const problemRotation = baseRotation + 240 + (problemIndex * (360 / problems.length));
+            
+            setRotations({
+              character: charRotation,
+              place: placeRotation,
+              problem: problemRotation
+            });
+            
+            setTimeout(() => {
+              setResults({
+                character: characters[charIndex],
+                place: places[placeIndex],
+                problem: problems[problemIndex]
+              });
+              setSpinning(false);
+            }, 3000);
+          };
+
+          const WheelSegment = ({ items, rotation, color }) => {
+            const segmentAngle = 360 / items.length;
+            
+            return React.createElement('div', { className: "relative w-48 h-48" },
+              React.createElement('div', {
+                className: "absolute inset-0 rounded-full border-8 border-white shadow-2xl transition-transform duration-3000 ease-out",
+                style: { 
+                  transform: `rotate(${rotation}deg)`,
+                  background: `conic-gradient(${items.map((_, i) => {
+                    const start = (i * segmentAngle);
+                    const end = ((i + 1) * segmentAngle);
+                    const colors = [color + 'dd', color + 'aa'];
+                    return `${colors[i % 2]} ${start}deg ${end}deg`;
+                  }).join(', ')})`
+                }
+              },
+                React.createElement('div', { className: "absolute inset-0 flex items-center justify-center" },
+                  React.createElement('div', { className: "w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center" },
+                    React.createElement('span', { className: "text-2xl" }, '✨')
+                  )
+                )
+              ),
+              React.createElement('div', { 
+                className: "absolute -top-6 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-12 border-l-transparent border-r-transparent border-t-red-500 drop-shadow-lg z-10",
+                style: { borderTopWidth: '24px' }
+              })
+            );
+          };
+
+          return (
+            React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 p-8" },
+              React.createElement('div', { className: "max-w-6xl mx-auto" },
+                React.createElement('h1', { className: "text-5xl font-bold text-white text-center mb-4 drop-shadow-lg" },
+                  '🎨 Ruleta de Historias 📖'
+                ),
+                React.createElement('p', { className: "text-xl text-white text-center mb-8 drop-shadow" },
+                  '¡Gira las ruletas y crea una historia increíble!'
+                ),
+                
+                React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-3 gap-8 mb-8" },
+                  React.createElement('div', { className: "bg-white rounded-2xl p-6 shadow-2xl" },
+                    React.createElement('h2', { className: "text-2xl font-bold text-purple-600 text-center mb-4" }, 'Personaje'),
+                    React.createElement('div', { className: "flex justify-center mb-4" },
+                      React.createElement(WheelSegment, { items: characters, rotation: rotations.character, color: "#9333ea" })
+                    ),
+                    results.character && !spinning && React.createElement('p', { className: "text-center text-lg font-semibold text-gray-700 bg-purple-100 rounded-lg p-3" },
+                      results.character
+                    )
+                  ),
+                  
+                  React.createElement('div', { className: "bg-white rounded-2xl p-6 shadow-2xl" },
+                    React.createElement('h2', { className: "text-2xl font-bold text-pink-600 text-center mb-4" }, 'Lugar'),
+                    React.createElement('div', { className: "flex justify-center mb-4" },
+                      React.createElement(WheelSegment, { items: places, rotation: rotations.place, color: "#ec4899" })
+                    ),
+                    results.place && !spinning && React.createElement('p', { className: "text-center text-lg font-semibold text-gray-700 bg-pink-100 rounded-lg p-3" },
+                      results.place
+                    )
+                  ),
+                  
+                  React.createElement('div', { className: "bg-white rounded-2xl p-6 shadow-2xl" },
+                    React.createElement('h2', { className: "text-2xl font-bold text-blue-600 text-center mb-4" }, 'Problema'),
+                    React.createElement('div', { className: "flex justify-center mb-4" },
+                      React.createElement(WheelSegment, { items: problems, rotation: rotations.problem, color: "#3b82f6" })
+                    ),
+                    results.problem && !spinning && React.createElement('p', { className: "text-center text-lg font-semibold text-gray-700 bg-blue-100 rounded-lg p-3" },
+                      results.problem
+                    )
+                  )
+                ),
+                
+                React.createElement('div', { className: "flex justify-center mb-8" },
+                  React.createElement('button', {
+                    onClick: spinWheels,
+                    disabled: spinning,
+                    className: `px-12 py-6 text-3xl font-bold rounded-full shadow-2xl transform transition-all ${
+                      spinning 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:scale-110 hover:shadow-3xl active:scale-95'
+                    } text-white`
+                  },
+                    spinning ? '🎲 Girando...' : '🎲 ¡GIRAR TODAS!'
+                  )
+                ),
+                
+                results.character && results.place && results.problem && !spinning && React.createElement('div', { className: "bg-white rounded-2xl p-8 shadow-2xl" },
+                  React.createElement('h3', { className: "text-3xl font-bold text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600" },
+                    '✨ Tu Historia ✨'
+                  ),
+                  React.createElement('p', { className: "text-xl text-gray-700 text-center leading-relaxed" },
+                    React.createElement('span', { className: "font-bold text-purple-600" }, results.character),
+                    ' ',
+                    React.createElement('span', { className: "font-bold text-pink-600" }, results.place.toLowerCase()),
+                    ' ',
+                    React.createElement('span', { className: "font-bold text-blue-600" }, results.problem.toLowerCase())
+                  ),
+                  React.createElement('p', { className: "text-center text-gray-500 mt-4 text-lg" },
+                    '¡Ahora escribe tu historia!'
+                  )
+                )
+              )
+            )
+          );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(StoryWheel));
+    </script>
+</body>
+</html>
